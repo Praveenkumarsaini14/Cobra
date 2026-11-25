@@ -1,0 +1,40 @@
+# Byte-compiled / optimised / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.orig
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# Cobra-specific build output
+*.asm
+*.o
+a.out
+build/
