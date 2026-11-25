@@ -1,167 +1,126 @@
-<div align="center">
+# 🐍 Cobra
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=32&pause=1000&color=F7A800&center=true&vCenter=true&width=600&lines=🐍+Cobra+Programming+Language;Python+Syntax+%7C+C+Performance;Build+from+Scratch+in+C%2FC%2B%2B" alt="Cobra" />
+> **A Python-syntax programming language that compiles to x86-64 assembly.**
 
-<br/>
-
-![Version](https://img.shields.io/badge/version-0.1.0--alpha-F7A800?style=for-the-badge&logo=python&logoColor=white)
-![Language](https://img.shields.io/badge/Written_in-C%2FC%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
-![Target](https://img.shields.io/badge/Target-x86--64-6E40C9?style=for-the-badge&logo=linux&logoColor=white)
-![Status](https://img.shields.io/badge/Status-In_Development-orange?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-
-**A high-performance, Python-syntax programming language compiled to native x86-64 machine code — built entirely from scratch in C/C++.**
-
-[🚀 Roadmap](#-roadmap) · [⚙️ Architecture](#%EF%B8%8F-compiler-architecture) · [📦 Installation](#-installation) · [🤝 Contributing](#-contributing)
-
-</div>
+Cobra lets you write clean, Python-like code that compiles all the way down to
+native x86-64 machine code — no virtual machine, no interpreter overhead.
 
 ---
 
-## 🎯 What is Cobra?
+## Current Status
 
-**Cobra** is a custom systems programming language that combines:
-- 🐍 **Python-like syntax** — indentation-based blocks, clean & readable
-- ⚡ **C-level performance** — compiles to native x86-64 assembly
-- 🔧 **Manual memory control** — no garbage collector, explicit `malloc`/`free`
-- 🏗️ **Zero external dependencies** — pure C/C++ implementation
+| Phase | Component | Status |
+|-------|-----------|--------|
+| **Phase 1** | Lexer (tokeniser) | ✅ **COMPLETE** |
+| **Phase 2** | Parser (AST builder) | 🔄 **In Progress** |
+| **Phase 3** | Type checker / Semantic analysis | ⏳ Planned |
+| **Phase 4** | IR generation | ⏳ Planned |
+| **Phase 5** | x86-64 code generation | ⏳ Planned |
 
-> Think of Cobra as "what if Python was compiled and had C's power under the hood."
+### What works right now (Phase 1 — Lexer)
 
----
-
-## ⚙️ Compiler Architecture
-
-```
-Source Code (.cobra)
-      │
-      ▼
-  ┌─────────┐
-  │  Lexer  │  → Token Stream (INT, FLOAT, IF, IDENT, INDENT, DEDENT...)
-  └─────────┘
-      │
-      ▼
-  ┌─────────┐
-  │  Parser │  → Abstract Syntax Tree (AST)
-  └─────────┘
-      │
-      ▼
-  ┌──────────────────┐
-  │ Semantic Analysis│  → Type Checking, Symbol Table, Scoping
-  └──────────────────┘
-      │
-      ▼
-  ┌──────────┐
-  │ Code Gen │  → x86-64 Assembly
-  └──────────┘
-      │
-      ▼
-  ┌──────────────────┐
-  │ Assembler+Linker │  → Native ELF/PE Executable
-  └──────────────────┘
-```
+* ✅ All token types defined (`INT`, `FLOAT`, `BOOL`, `STR`, `IDENT`, operators, delimiters, …)
+* ✅ Python-style **indentation tracking** — emits `INDENT` / `DEDENT` tokens correctly
+* ✅ String literals (single- and double-quoted, with escape sequences)
+* ✅ Integer and floating-point number literals
+* ✅ Identifier and keyword recognition (`if`, `else`, `while`, `for`, `fn`, `return`, …)
+* ✅ All arithmetic, comparison, and logical operators
+* ✅ Line comments starting with `#`
+* ✅ Accurate **line & column** tracking for error reporting
+* ✅ CLI entry point — lex any `.cobra` file and print the token stream
 
 ---
 
-## 🗺️ Roadmap
+## Example
 
-### ✅ Phase 1 — Language Specification
-- [x] Python-like indentation-based syntax design
-- [x] Static typing with type inference (`x = 5` → `int`)
-- [x] Core types: `int`, `float`, `bool`, `ptr`
-- [x] Control flow: `if/else`, `while`, `for`, functions
-- [x] Formal EBNF grammar definition
-
-### 🔄 Phase 2 — Compiler Architecture (In Progress)
-- [ ] Lexer / Tokenizer with INDENT/DEDENT support
-- [ ] Recursive Descent Parser → AST
-- [ ] Semantic Analysis & Symbol Table
-
-### ⏳ Phase 3 — Code Generation
-- [ ] x86-64 Assembly emission
-- [ ] Register allocator (stack-based → linear scan)
-- [ ] Function prologue/epilogue (System V ABI)
-- [ ] Heap allocation via `sys_brk` / `VirtualAlloc`
-
-### ⏳ Phase 4 — Optimizations
-- [ ] Constant folding
-- [ ] Dead code elimination
-- [ ] Peephole optimization (`mov rax,0` → `xor rax,rax`)
-
-### ⏳ Phase 5 — Standard Library
-- [ ] `print_int()`, `print_str()` via syscalls
-- [ ] Basic heap allocator
-- [ ] DWARF debug info
-
----
-
-## 💻 Sample Cobra Code
+Given `hello.cobra`:
 
 ```python
-# Cobra syntax — Python-like but compiles to native code
-fn fibonacci(n: int) -> int:
-    if n <= 1:
-        return n
-    return fibonacci(n - 1) + fibonacci(n - 2)
+fn greet(name):
+    if name == "world":
+        return "Hello, world!"
+    return "Hello, " + name
+```
 
-fn main() -> int:
-    x: int = 10
-    result: int = fibonacci(x)
-    print(result)   # → 55
-    return 0
+Run the lexer:
+
+```bash
+python3 main.py hello.cobra
+```
+
+Output (token stream):
+
+```
+=== Token stream for hello.cobra ===
+
+  Token(FN, 'fn', line=1, col=1)
+  Token(IDENT, 'greet', line=1, col=4)
+  Token(LPAREN, '(', line=1, col=9)
+  ...
+  Token(EOF, '', line=5, col=1)
 ```
 
 ---
 
-## 📦 Installation
+## Project Structure
+
+```
+Cobra/
+├── main.py               # CLI entry point
+├── src/
+│   ├── __init__.py
+│   ├── lexer/
+│   │   ├── __init__.py
+│   │   ├── tokens.py     # TokenType enum + Token dataclass
+│   │   └── lexer.py      # Full Lexer class
+│   └── parser/
+│       ├── __init__.py
+│       └── ast_nodes.py  # AST node dataclasses (Program, FunctionDef, …)
+├── tests/                # pytest test suite
+├── Makefile              # test / run / clean
+├── LICENSE               # MIT
+└── CONTRIBUTING.md
+```
+
+---
+
+## Quick Start
 
 ```bash
-# Clone the repository
+# Clone the repo
 git clone https://github.com/Praveenkumarsaini14/Cobra.git
 cd Cobra
 
-# Build the compiler (requires GCC/Clang)
-make build
+# (Optional) create a virtual environment
+python3 -m venv .venv && source .venv/bin/activate
 
-# Compile a Cobra file
-./cobrac hello.cobra -o hello
+# Lex a Cobra source file
+python3 main.py examples/hello.cobra
 
-# Run!
-./hello
+# Run tests
+make test
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Roadmap
 
-| Component | Technology |
-|-----------|-----------|
-| Compiler Host | C / C++ |
-| Target Architecture | x86-64 (Linux/Windows) |
-| ABI | System V AMD64 |
-| Output Format | ELF (Linux) / PE (Windows) |
-| Build System | GNU Make |
+- [x] **Phase 1** — Lexer
+- [ ] **Phase 2** — Parser (recursive-descent, produces AST)
+- [ ] **Phase 3** — Type checker & semantic analysis
+- [ ] **Phase 4** — Intermediate representation (IR) generation
+- [ ] **Phase 5** — x86-64 assembly code generation & linking
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-Contributions are welcome! Please open an issue first to discuss what you'd like to change.
-
-```bash
-git checkout -b feature/your-feature
-git commit -m "feat: add your feature"
-git push origin feature/your-feature
-# → Open a Pull Request
-```
+Contributions are very welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for
+guidelines on setting up your environment, coding standards, and submitting
+pull requests.
 
 ---
 
-## 📄 License
+## License
 
-MIT License © 2024 [Praveen Kumar Saini](https://github.com/Praveenkumarsaini14)
-
-<div align="center">
-<br/>
-⭐ <b>Star this repo if you find it interesting!</b> ⭐
-</div>
+[MIT](LICENSE) © 2024 Praveen Kumar Saini
